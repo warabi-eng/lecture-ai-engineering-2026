@@ -8,10 +8,13 @@ import json
 import random
 from functools import cache
 from pathlib import Path
+from datetime import datetime
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 MAX_RESULTS = 3
 
+LOG_DIR = Path("learning_log")
+LOG_PATH = LOG_DIR / "learning_log.md"
 
 @cache
 def load_glossary() -> list[dict]:
@@ -98,3 +101,21 @@ def make_quiz(lecture: int) -> str:
         },
         ensure_ascii=False,
     )
+
+def save_learning_log(question: str, answer: str) -> str:
+    """学習内容の質問と回答を保存する。保存指示や承認・完了のやり取りは含めない。"""
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    content = f"""
+---
+## 学習記録
+### 保存日時 {now}
+### 質問 {question}
+### 解答 {answer}
+"""
+    with LOG_PATH.open("a", encoding="utf-8") as f:
+        f.write(content)
+
+    return f"学習ログを{LOG_PATH}に保存しました。"
