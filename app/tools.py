@@ -5,14 +5,18 @@
 """
 
 import json
+import random
 from functools import cache
 from pathlib import Path
+from datetime import datetime
 
 from app.config import api_error_message
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 MAX_RESULTS = 3
 
+LOG_DIR = Path("learning_log")
+LOG_PATH = LOG_DIR / "learning_log.md"
 
 @cache
 def load_glossary() -> list[dict]:
@@ -81,6 +85,7 @@ def get_lecture_summary(lecture: int) -> str:
     return path.read_text(encoding="utf-8")
 
 
+
 def search_materials(query: str) -> str:
     """第1〜3回の本講義資料を検索し、関連ページの本文・タイトル・ページ番号を返す。
 
@@ -126,3 +131,41 @@ def search_graph(query: str) -> str:
         return json.dumps({"error": str(e)}, ensure_ascii=False)
     except APIError as e:
         return json.dumps({"error": api_error_message(e.code)}, ensure_ascii=False)
+
+def make_quiz(lecture: int) -> str:
+    """ユーザーが指定した回の用語から１つをランダムに選び、確認問題と答えを返す。
+
+    用語名の指定は不要。「第２回の確認問題を出して」のように、
+    復習用の問題を求められたときに使う。
+    """
+    lecs = [e for e in load_glossary() if e["lecture"] == lecture]
+    if not lecs:
+        return f"第{lecture}回の用語が用語集に見つかりませんでした。"
+
+    choice = random.choice(lecs)
+    return json.dumps(
+        {
+            "question": f"「{choice['term']}」の意味は？",
+            "answer": choice["definition"],
+        },
+        ensure_ascii=False,
+    )
+
+def save_learning_log(question: str, answer: str) -> str:
+    """学習内容の質問と回答を保存する。保存指示や承認・完了のやり取りは含めない。"""
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    content = f"""
+---
+## 学習記録
+### 保存日時 {now}
+### 質問 {question}
+### 解答 {answer}
+"""
+    with LOG_PATH.open("a", encoding="utf-8") as f:
+        f.write(content)
+
+    return f"学習ログを{LOG_PATH}に保存しました。"
+
