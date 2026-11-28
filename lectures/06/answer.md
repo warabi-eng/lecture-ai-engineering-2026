@@ -14,7 +14,7 @@
 
 <!-- 基礎・実装・発展のどれか1つに取り組めば完了です。 -->
 
-- 取り組んだレベル：基礎
-- やったこと：app/mcp_server.pyを修正し、MCPサーバーにツール（get_lecture_summary）を公開した。
-- 結果：glossary_get_lecture_summaryがツールとして追加され、質問に対して当該ツールが呼ばれることや、テストが通ることが確認できた。
-- 気づき・疑問：過去のの宿題で追加したコードが原因でuv run pytest -pが通らない箇所があった。テストの実施方法や結果の読み方などを学習する必要があると感じた。
+- 取り組んだレベル：実装
+- やったこと：app/mcp_server.pyを修正し、MCPサーバーにツール（make_quiz）を公開した。また、make_quizのコードを修正し、範囲外になる質問をした場合にreturnでエラーメッセージを返す場合と、例外（raise）にした場合とでtraceの内容を比較した。
+- 結果：glossary_make_quizがツールとして追加され、質問に対して当該ツールが呼ばれることや、テストが通ることが確認できた。また、範囲外の質問をした場合、returnで返すメッセージについては[tool return]に出てくることが確認できたが、例外（raise）の場合に[tool error]には設定していたメッセージは出てこず、Error executing tool make_quizという表示が出た。
+- 気づき・疑問：ValueErrorが提起された場合にあらかじめ設定していたメッセージが[tool error]には出てこず、Error executing tool make_quizという表示が出てきた理由が分からなかった。
