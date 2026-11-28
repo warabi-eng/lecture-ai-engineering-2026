@@ -11,7 +11,7 @@ from pydantic_ai import DeferredToolRequests
 from pydantic_ai.messages import ToolCallPart, ToolReturnPart
 from pydantic_ai.models.test import TestModel
 
-from app.agent import agent, request_tool_approvals, run_chat, run_prompt
+from app.agent import agent
 
 BASE_TOOLS = {"search_materials"}
 
